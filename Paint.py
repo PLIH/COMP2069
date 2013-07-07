@@ -31,6 +31,9 @@ def main():
     save = Buttons.Button()
     load = Buttons.Button()
 
+    #Line Width
+    widthBtn = Buttons.Button()
+
     #colour Buttons
     colourArea = Buttons.Button()
     colourPicker = Buttons.Button()
@@ -81,13 +84,15 @@ def main():
 
     clock = pygame.time.Clock()
     colourChoice = False
+    widthChoice = False
     preview = False
-    toolMenu = True
+    toolMenu = False
     keepGoing = True
     LineStart = (0,0)
     lineEnd = (0,0)
 
     selectedLocation = (550,550)
+    selectedWidth = 3
     selectedValue = ""
     println = ""
     activeEvent = "line"
@@ -124,7 +129,7 @@ def main():
                         else:
                             toolMenu = True
                 elif event.type == pygame.MOUSEBUTTONDOWN:
-                    if colourChoice == False:
+                    if colourChoice == False and widthChoice == False:
                         if str8Line.onClick(pygame.mouse.get_pos()):
                             selectedLine = "str8line.png"
                         elif curvedLine.onClick(pygame.mouse.get_pos()):
@@ -137,6 +142,8 @@ def main():
                             selectedShape = "squareFill.png"
                         elif crFill.onClick(pygame.mouse.get_pos()):
                             selectedShape = "circleFill.png"
+                        elif widthBtn.onClick(pygame.mouse.get_pos()):
+                            widthChoice = True
                         elif colourArea.onClick(pygame.mouse.get_pos()):
                             println = "Please select a colour to edit"
                         elif colour1.onClick(pygame.mouse.get_pos()):
@@ -241,7 +248,15 @@ def main():
                             elif selectedColour == "fill":
                                 colourFill = chosenColour
 
-                        
+                if widthChoice:
+                    println = "Up or Down to change line Width. Enter to Set"
+                    if event.type == pygame.KEYDOWN:
+                        if event.key == pygame.K_UP:
+                            selectedWidth += 1
+                        elif event.key == pygame.K_DOWN:
+                            selectedWidth -= 1
+                        elif event.key == pygame.K_RETURN:
+                            widthChoice = False
                         
             tools.blit(bk, (0,0))
             screen.blit(userTips, (0,510))
@@ -274,11 +289,14 @@ def main():
             clBlk.square(bk,(0,0,0),30,30,310,405)
             clWht.square(bk,(255,255,255),30,30,345,405)
 
+            #Line Width blit area
+            widthBtn.labeledButton(bk,(150,150,150),30,30,510,260,str(selectedWidth),(0,0,0))
+
             #Shows tool bar on the Canvas screen
             lines.graphic(bk, 30,30,510,125,selectedLine)
             shapes.graphic(bk,30,30,510,165,selectedShape)
-            colour1.square(bk,colourOutline,30,30,510,300);
-            colour2.square(bk,colourFill,30,30,510,340);
+            colour1.square(bk,colourOutline,30,30,510,300)
+            colour2.square(bk,colourFill,30,30,510,340)
 
         else:
             for event in pygame.event.get():
@@ -312,6 +330,9 @@ def main():
                         activeEvent = "line"
                     elif shapes.onClick(pygame.mouse.get_pos()):
                         activeEvent = "shape"
+                    elif widthBtn.onClick(pygame.mouse.get_pos()):
+                        toolMenu = True
+                        widthChoice = True
                     elif colourPicker.onClick(pygame.mouse.get_pos()):
                         activeEvent = "colour Picker"
                     elif colour1.onClick(pygame.mouse.get_pos()):
@@ -331,7 +352,7 @@ def main():
                             preview = True
                         elif event.type == pygame.MOUSEBUTTONUP:
                             lineEnd = pygame.mouse.get_pos()
-                            pygame.draw.line(canvas, colourOutline, lineStart, lineEnd, 3)
+                            pygame.draw.line(canvas, colourOutline, lineStart,lineEnd, selectedWidth)
                             preview = False
                         elif event.type == pygame.MOUSEMOTION:
                             lineEnd = pygame.mouse.get_pos()
@@ -340,7 +361,7 @@ def main():
                         if event.type == pygame.MOUSEMOTION:
                             lineEnd = pygame.mouse.get_pos()
                             if pygame.mouse.get_pressed() == (1,0,0):
-                                pygame.draw.line(canvas,colourOutline,lineStart,lineEnd,1)
+                                pygame.draw.line(canvas,colourOutline,lineStart,lineEnd,selectedWidth)
                             lineStart = lineEnd
                                 
                 elif activeEvent == "shape":
@@ -353,7 +374,7 @@ def main():
                         elif event.type == pygame.MOUSEBUTTONUP:
                             currentPos = pygame.mouse.get_pos()
                             lineEnd = (currentPos[0]-lineStart[0], currentPos[1]-lineStart[1])
-                            pygame.draw.rect(canvas,colourOutline,(lineStart,lineEnd),3)
+                            pygame.draw.rect(canvas,colourOutline,(lineStart,lineEnd),selectedWidth)
                             preview = False
                         elif event.type == pygame.MOUSEMOTION:
                             currentPos = pygame.mouse.get_pos()
@@ -368,7 +389,7 @@ def main():
                             currentPos = pygame.mouse.get_pos()
                             lineEnd = (currentPos[0]-lineStart[0], currentPos[1]-lineStart[1])
                             if lineEnd > (1,1):
-                                pygame.draw.ellipse(canvas,colourOutline,(lineStart,lineEnd),1)
+                                pygame.draw.ellipse(canvas,colourOutline,(lineStart,lineEnd),selectedWidth)
                                 preview = False
                         elif event.type == pygame.MOUSEMOTION:
                             currentPos = pygame.mouse.get_pos()
@@ -383,7 +404,7 @@ def main():
                             currentPos = pygame.mouse.get_pos()
                             lineEnd = (currentPos[0]-lineStart[0], currentPos[1]-lineStart[1])
                             pygame.draw.rect(canvas,colourFill,(lineStart,lineEnd),0)
-                            pygame.draw.rect(canvas,colourOutline,(lineStart,lineEnd),3)
+                            pygame.draw.rect(canvas,colourOutline,(lineStart,lineEnd),selectedWidth)
                             preview = False
                         elif event.type == pygame.MOUSEMOTION:
                             currentPos = pygame.mouse.get_pos()
@@ -399,7 +420,7 @@ def main():
                             lineEnd = (currentPos[0]-lineStart[0], currentPos[1]-lineStart[1])
                             if lineEnd > (1,1):
                                 pygame.draw.ellipse(canvas,colourFill,(lineStart,lineEnd),0)
-                                pygame.draw.ellipse(canvas,colourOutline,(lineStart,lineEnd),1)
+                                pygame.draw.ellipse(canvas,colourOutline,(lineStart,lineEnd),selectedWidth)
                                 preview = False
                         elif event.type == pygame.MOUSEMOTION:
                             currentPos = pygame.mouse.get_pos()
@@ -425,6 +446,7 @@ def main():
             load.graphic(background, 30,30,510,75,"load.png")
             lines.graphic(background, 30,30,510,125,selectedLine)
             shapes.graphic(background,30,30,510,165,selectedShape)
+            widthBtn.labeledButton(background,(150,150,150),30,30,510,260,str(selectedWidth),(0,0,0))
             colour1.square(background,colourOutline,30,30,510,300)
             colour2.square(background,colourFill,30,30,510,340)
             if (preview and activeEvent == "line"):
