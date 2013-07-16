@@ -21,6 +21,7 @@ def main():
 ##   --------------------------------------------
 ##      This is for the background and the canvas of the main screen
     screen = pygame.display.set_mode((550,550))
+    pygame.display.set_caption("NGwKs Paint: A Paint Program")
 
     background = pygame.Surface(screen.get_size())
     background = background.convert()
